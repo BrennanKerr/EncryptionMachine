@@ -1,0 +1,9 @@
+D:\Created Programs\EncryptionStuff\EncryptionMachine\EncryptionMachine\bin\Debug\netstandard2.0\EncryptionMachine.deps.json
+D:\Created Programs\EncryptionStuff\EncryptionMachine\EncryptionMachine\bin\Debug\netstandard2.0\EncryptionMachine.dll
+D:\Created Programs\EncryptionStuff\EncryptionMachine\EncryptionMachine\bin\Debug\netstandard2.0\EncryptionMachine.pdb
+D:\Created Programs\EncryptionStuff\EncryptionMachine\EncryptionMachine\obj\Debug\netstandard2.0\EncryptionMachine.csprojAssemblyReference.cache
+D:\Created Programs\EncryptionStuff\EncryptionMachine\EncryptionMachine\obj\Debug\netstandard2.0\EncryptionMachine.AssemblyInfoInputs.cache
+D:\Created Programs\EncryptionStuff\EncryptionMachine\EncryptionMachine\obj\Debug\netstandard2.0\EncryptionMachine.AssemblyInfo.cs
+D:\Created Programs\EncryptionStuff\EncryptionMachine\EncryptionMachine\obj\Debug\netstandard2.0\EncryptionMachine.csproj.CoreCompileInputs.cache
+D:\Created Programs\EncryptionStuff\EncryptionMachine\EncryptionMachine\obj\Debug\netstandard2.0\EncryptionMachine.dll
+D:\Created Programs\EncryptionStuff\EncryptionMachine\EncryptionMachine\obj\Debug\netstandard2.0\EncryptionMachine.pdb
