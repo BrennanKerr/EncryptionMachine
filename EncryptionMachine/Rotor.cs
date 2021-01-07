@@ -49,16 +49,17 @@ namespace EncryptionMachine
         /// <param name="letters">the letters that cause the rotation</param>
         public Rotor(string name, string cypher, string rotorString, char[] letters)
         {
-            if (cypher.Length == rotorString.Length)
+            try
             {
+                CheckStrings(rotorString, cypher);
+
                 RotorName = name;
                 RotorRotationLetters = letters;
-
-                SetCypher(cypher);
-                SetString(rotorString);
             }
-            else
-                throw new Exception("The string and cypher must be the same length");
+            catch (Exception ex)
+            {
+                throw ex;
+            }
         }
 
         #endregion
@@ -91,10 +92,7 @@ namespace EncryptionMachine
             }
             set
             {
-                if (value.Length == rotorString.Length)
-                    rotorCypher = value;
-                else
-                    throw new Exception("The cypher must be the same length as the string");
+                CheckStrings(RotorString, value);
             }
         }
 
@@ -109,10 +107,7 @@ namespace EncryptionMachine
             }
             set
             {
-                if (value.Length == rotorCypher.Length)
-                    rotorString = value;
-                else
-                    throw new Exception("The string must be the same length as the cypher");
+                CheckStrings(value, RotorCypher);
             }
         }
 
@@ -158,6 +153,15 @@ namespace EncryptionMachine
         }
 
         /// <summary>
+        /// Allows for the rotor to be offset
+        /// </summary>
+        /// <param name="rotations"></param>
+        public void OffsetCypher(int rotations = 1)
+        {
+            rotorCypher = RotateString(rotorCypher, rotations);
+        }
+
+        /// <summary>
         /// Creates a deep copy of the rotor
         /// </summary>
         /// <returns>the copy</returns>
@@ -188,6 +192,94 @@ namespace EncryptionMachine
         private void SetCypher(string val)
         {
             rotorCypher = val;
+        }
+
+        /// <summary>
+        /// Checks to make sure the strings are the same
+        /// </summary>
+        /// <param name="str">the string used to cross the rotor</param>
+        /// <param name="cypher">the cypher used in the rotor</param>
+        private void CheckStrings(string str, string cypher)
+        {
+            Dictionary<POTENTIAL_ERRORS, List<char>> errors
+                = new Dictionary<POTENTIAL_ERRORS, List<char>>();
+
+            List<char> currentCheck = new List<char>();
+
+            // check for dublicates in str
+            currentCheck = CheckDublicates(str);
+
+            if (currentCheck.Count > 0)
+            {
+                errors.Add(POTENTIAL_ERRORS.Dublicates_FromString, currentCheck);
+            }
+
+            // check for dublicates in cypher
+            currentCheck = CheckDublicates(cypher);
+
+            if (currentCheck.Count > 0)
+            {
+                errors.Add(POTENTIAL_ERRORS.Dublicates_FromCypher, currentCheck);
+            }
+
+            // look for missing letters
+            currentCheck = CheckCharacters(cypher, str);
+            if (currentCheck.Count > 0)
+            {
+                errors.Add(POTENTIAL_ERRORS.Missing_FromString, currentCheck);
+            }
+
+            currentCheck = CheckCharacters(str, cypher);
+            if (currentCheck.Count > 0)
+            {
+                errors.Add(POTENTIAL_ERRORS.Missing_FromCypher, currentCheck);
+            }
+
+
+            // if everything is valid
+            if (errors.Count == 0)
+            {
+                rotorString = str;
+                rotorCypher = cypher;
+            }
+            else
+            {
+                // throw exception
+                throw new InvalidRotorSettingsException(errors, str, cypher);
+            }
+        }
+
+        private List<char> CheckCharacters(string str1, string str2)
+        {
+            List<char> invalid = new List<char>();
+
+            for (int i = 0; i < str1.Length; i++)
+            {
+                char c = str1[i];
+
+                if (!str2.Contains(c.ToString()))
+                    if (!invalid.Contains(c))
+                        invalid.Add(c);
+
+            }
+
+            return invalid;
+        }
+
+        private List<char> CheckDublicates(string str)
+        {
+            List<char> dublicates = new List<char>();
+
+            for (int i = 0; i < str.Length; i++)
+            {
+                char c = str[i];
+
+                if (str.Substring(i + 1).Contains(c.ToString()))
+                    if (!dublicates.Contains(c))
+                        dublicates.Add(c);
+            }
+
+            return dublicates;
         }
 
         #endregion
