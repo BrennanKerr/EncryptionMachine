@@ -17,6 +17,8 @@ namespace EncryptionMachine
     /// </summary>
     public class Reflector
     {
+        #region FIELDS
+
         /// <summary>
         /// The name of the reflector
         /// </summary>
@@ -26,6 +28,10 @@ namespace EncryptionMachine
         /// </summary>
         private string reflectorReflection = "";
 
+        #endregion
+
+        #region CONSTRUCTORS
+
         /// <summary>
         /// Creates a new reflector object
         /// </summary>
@@ -33,9 +39,21 @@ namespace EncryptionMachine
         /// <param name="reflection">The reflection for the reflector</param>
         public Reflector(string name, string reflection)
         {
+            ReflectorName = name;
 
+            try
+            {
+                ReflectorReflection = reflection;
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
         }
 
+        #endregion
+
+        #region PROPERTIES
         /// <summary>
         /// Gets or sets the reflector
         /// </summary>
@@ -62,8 +80,39 @@ namespace EncryptionMachine
             }
             set
             {
+                for (int i = 0; i < value.Length; i++)
+                {
+                    string c = value[i].ToString();
+                    if (value.Substring(i + 1, value.Length - i - 1).Contains(c))
+                    {
+                        throw new Exception("There is a dublicate letter: " + c);
+                    }
+                }
+
                 reflectorReflection = value;
             }
         }
+
+        #endregion
+
+        #region METHODS
+
+        #endregion
+
+        #region OVERRIDES
+
+        /// <summary>
+        /// Returns the reflector as a string
+        /// </summary>
+        /// <returns></returns>
+        public override string ToString()
+        {
+            string str = "Reflector Name: " + ReflectorName + "\n";
+            str += "Reflector Reflection: " + ReflectorReflection;
+
+            return str;
+        }
+
+        #endregion
     }
 }

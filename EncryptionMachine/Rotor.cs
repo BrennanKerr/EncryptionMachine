@@ -17,6 +17,8 @@ namespace EncryptionMachine
     /// </summary>
     public class Rotor
     {
+        #region FIELDS
+
         /// <summary>
         /// The name given to the rotor
         /// </summary>
@@ -32,7 +34,11 @@ namespace EncryptionMachine
         /// <summary>
         /// The array of letters that would cause the rotor beside to rotate
         /// </summary>
-        private string[] rotorRotateLetters = { };
+        private char[] rotorRotateLetters = { };
+
+        #endregion
+
+        #region CONSTRUCTORS
 
         /// <summary>
         /// Rotor() - Constructor
@@ -41,13 +47,23 @@ namespace EncryptionMachine
         /// <param name="cypher">the cypher for the rotor</param>
         /// <param name="rotorString">the string for the rotor</param>
         /// <param name="letters">the letters that cause the rotation</param>
-        public Rotor(string name, string cypher, string rotorString, string[] letters)
+        public Rotor(string name, string cypher, string rotorString, char[] letters)
         {
-            RotorName = name;
-            RotorCypher = cypher;
-            RotorString = rotorString;
-            RotorRotationLetters = letters;
+            if (cypher.Length == rotorString.Length)
+            {
+                RotorName = name;
+                RotorRotationLetters = letters;
+
+                SetCypher(cypher);
+                SetString(rotorString);
+            }
+            else
+                throw new Exception("The string and cypher must be the same length");
         }
+
+        #endregion
+
+        #region PROPERTIES
 
         /// <summary>
         /// RotorName - Gets or sets the rotor name
@@ -75,7 +91,10 @@ namespace EncryptionMachine
             }
             set
             {
-                rotorCypher = value;
+                if (value.Length == rotorString.Length)
+                    rotorCypher = value;
+                else
+                    throw new Exception("The cypher must be the same length as the string");
             }
         }
 
@@ -90,14 +109,17 @@ namespace EncryptionMachine
             }
             set
             {
-                rotorString = value;
+                if (value.Length == rotorCypher.Length)
+                    rotorString = value;
+                else
+                    throw new Exception("The string must be the same length as the cypher");
             }
         }
 
         /// <summary>
         /// Gets or sets the rotation letters
         /// </summary>
-        public string[] RotorRotationLetters
+        public char[] RotorRotationLetters
         { 
             get
             {
@@ -108,5 +130,87 @@ namespace EncryptionMachine
                 rotorRotateLetters = value;
             }
         }
+
+        #endregion
+
+        #region METHODS
+
+        /// <summary>
+        /// Rotates the rotor a defined number of times
+        /// </summary>
+        /// <param name="rotations">the number of rotations to make</param>
+        public void Rotate(int rotations = 1)
+        {
+            rotorCypher = RotateString(rotorCypher, rotations);
+            rotorString = RotateString(rotorString, rotations);
+        }
+
+        /// <summary>
+        /// RotateString() - used to rotate a given string a defined number of times
+        /// </summary>
+        /// <param name="str">the string to rotate</param>
+        /// <param name="rotations">the number of rotations</param>
+        /// <returns>The rotated string</returns>
+        private string RotateString(string str, int rotations = 1)
+        {
+            string new_str = str.Substring(rotations, str.Length - rotations) + str.Substring(0, rotations);
+            return new_str;
+        }
+
+        /// <summary>
+        /// Creates a deep copy of the rotor
+        /// </summary>
+        /// <returns>the copy</returns>
+        public Rotor DeepCopy()
+        {
+            string name = this.rotorName;
+            string cypher = this.rotorCypher;
+            string str = this.rotorString;
+            char[] letters = this.rotorRotateLetters;
+
+            return new Rotor(name, cypher, str, letters);
+            
+        }
+
+        /// <summary>
+        /// Sets the rotor string
+        /// </summary>
+        /// <param name="val"></param>
+        private void SetString(string val)
+        {
+            rotorString = val;
+        }
+
+        /// <summary>
+        /// Sets the rotor cypher
+        /// </summary>
+        /// <param name="val"></param>
+        private void SetCypher(string val)
+        {
+            rotorCypher = val;
+        }
+
+        #endregion
+
+        #region OVERRIDES
+
+        /// <summary>
+        /// Converts the Rotor to a string
+        /// </summary>
+        /// <returns></returns>
+        public override string ToString()
+        {
+            string str = "Rotor Name: " + RotorName + "\n";
+            str += "Rotor Cypher: " + rotorCypher + "\n";
+            str += "Rotor String: " + rotorString + "\n";
+            str += "Rotor Rotation Letters: ";
+
+            for (int i = 0; i < RotorRotationLetters.Length; i++)
+                str += RotorRotationLetters[i].ToString() + " ";
+
+            return str;
+        }
+
+        #endregion
     }
 }
