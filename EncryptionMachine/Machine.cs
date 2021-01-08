@@ -78,9 +78,19 @@ namespace EncryptionMachine
         /// </summary>
         /// <param name="index">the index of the desired rotor</param>
         /// <returns>the rotor at the given index</returns>
-        public Rotor GetRotor(int index)
+        public Rotor GetRotorAt(int index)
         {
             return machineRotors[index];
+        }
+
+        /// <summary>
+        /// Sets the rotor at the given index
+        /// </summary>
+        /// <param name="index">the index to change</param>
+        /// <param name="newRotor">the settings of the new rotor</param>
+        public void SetRotorAt(int index, Rotor newRotor)
+        {
+            machineRotors[index] = newRotor.DeepCopy();
         }
 
         /// <summary>
@@ -118,6 +128,7 @@ namespace EncryptionMachine
                 throw new IndexOutOfRangeException("The index selected is out of range");
             }
         }
+
         #endregion
 
         #region OVERRIDES

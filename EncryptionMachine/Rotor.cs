@@ -207,7 +207,7 @@ namespace EncryptionMachine
             List<char> currentCheck = new List<char>();
 
             // check for dublicates in str
-            currentCheck = CheckDublicates(str);
+            currentCheck = BasicFunctions.DuplicatedCharacters(str);
 
             if (currentCheck.Count > 0)
             {
@@ -215,7 +215,7 @@ namespace EncryptionMachine
             }
 
             // check for dublicates in cypher
-            currentCheck = CheckDublicates(cypher);
+            currentCheck = BasicFunctions.DuplicatedCharacters(cypher);
 
             if (currentCheck.Count > 0)
             {
@@ -223,13 +223,13 @@ namespace EncryptionMachine
             }
 
             // look for missing letters
-            currentCheck = CheckCharacters(cypher, str);
+            currentCheck = CompareStringsCharacters(cypher, str);
             if (currentCheck.Count > 0)
             {
                 errors.Add(POTENTIAL_ERRORS.Missing_FromString, currentCheck);
             }
 
-            currentCheck = CheckCharacters(str, cypher);
+            currentCheck = CompareStringsCharacters(str, cypher);
             if (currentCheck.Count > 0)
             {
                 errors.Add(POTENTIAL_ERRORS.Missing_FromCypher, currentCheck);
@@ -249,7 +249,13 @@ namespace EncryptionMachine
             }
         }
 
-        private List<char> CheckCharacters(string str1, string str2)
+        /// <summary>
+        /// Compares the two strings to ensure they share characters
+        /// </summary>
+        /// <param name="str1">the first string that contains all the desired characters</param>
+        /// <param name="str2">the second string</param>
+        /// <returns>the list of characters that are missing</returns>
+        private List<char> CompareStringsCharacters(string str1, string str2)
         {
             List<char> invalid = new List<char>();
 
@@ -264,22 +270,6 @@ namespace EncryptionMachine
             }
 
             return invalid;
-        }
-
-        private List<char> CheckDublicates(string str)
-        {
-            List<char> dublicates = new List<char>();
-
-            for (int i = 0; i < str.Length; i++)
-            {
-                char c = str[i];
-
-                if (str.Substring(i + 1).Contains(c.ToString()))
-                    if (!dublicates.Contains(c))
-                        dublicates.Add(c);
-            }
-
-            return dublicates;
         }
 
         #endregion

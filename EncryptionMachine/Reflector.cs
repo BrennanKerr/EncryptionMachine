@@ -80,14 +80,10 @@ namespace EncryptionMachine
             }
             set
             {
-                for (int i = 0; i < value.Length; i++)
-                {
-                    string c = value[i].ToString();
-                    if (value.Substring(i + 1, value.Length - i - 1).Contains(c))
-                    {
-                        throw new Exception("There is a dublicate letter: " + c);
-                    }
-                }
+                List<char> duplicates = BasicFunctions.DuplicatedCharacters(value);
+                if (duplicates.Count > 0)
+                    throw new InvalidReflectorException(value, duplicates);
+
 
                 reflectorReflection = value;
             }
@@ -96,6 +92,16 @@ namespace EncryptionMachine
         #endregion
 
         #region METHODS
+
+        /// <summary>
+        /// Gets the character that corresponds to the letter
+        /// </summary>
+        /// <param name="c">the letter to reflect</param>
+        /// <returns>the reflected character</returns>
+        public char ReflectionCharacter(char c)
+        {
+            return ReflectorReflection[BasicFunctions.IndexInAlphabet(c)];
+        }
 
         #endregion
 

@@ -93,25 +93,6 @@ namespace EncryptionMachine
 
         #region METHODS
 
-        /// <summary>
-        /// Runs through the list provided to display the error characters
-        /// </summary>
-        /// <param name="list">the list to display</param>
-        /// <returns>the list of error characters</returns>
-        public string RunThroughList(List<char> list)
-        {
-            string str = "";    // create a new string
-
-            // run through each char in the list
-            for (int i = 0; i < list.Count; i++)
-            {
-                str += list[i] + (i == list.Count - 1 ? "" : ", ");
-            }
-
-            str += "\n";
-
-            return str;
-        }
 
         /// <summary>
         /// Display any errors that occured
@@ -127,7 +108,7 @@ namespace EncryptionMachine
                 if (errorStr == "")
                     errorStr += "Errors with " + (isCypher ? "Cypher: " + cypher : "String: " + str) + "\n";
 
-                errorStr += reason + ": " + RunThroughList(errors[key]);
+                errorStr += reason + ": " + BasicFunctions.RunThroughList(errors[key]);
             }
         }
 
