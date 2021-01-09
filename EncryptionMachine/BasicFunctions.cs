@@ -6,9 +6,7 @@
  *                  by more then 1 class
  */
 
-using System;
 using System.Collections.Generic;
-using System.Text;
 
 namespace EncryptionMachine
 {

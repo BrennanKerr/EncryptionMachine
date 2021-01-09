@@ -7,7 +7,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Text;
 
 namespace EncryptionMachine
 {
@@ -54,6 +53,7 @@ namespace EncryptionMachine
         #endregion
 
         #region PROPERTIES
+
         /// <summary>
         /// Gets or sets the reflector
         /// </summary>
@@ -81,6 +81,7 @@ namespace EncryptionMachine
             set
             {
                 List<char> duplicates = BasicFunctions.DuplicatedCharacters(value);
+
                 if (duplicates.Count > 0)
                     throw new InvalidReflectorException(value, duplicates);
 
@@ -98,7 +99,7 @@ namespace EncryptionMachine
         /// </summary>
         /// <param name="c">the letter to reflect</param>
         /// <returns>the reflected character</returns>
-        public char ReflectionCharacter(char c)
+        public char GetReflectedCharacter(char c)
         {
             return ReflectorReflection[BasicFunctions.IndexInAlphabet(c)];
         }

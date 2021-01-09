@@ -7,7 +7,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Text;
 
 namespace EncryptionMachine
 {
@@ -51,11 +50,14 @@ namespace EncryptionMachine
         {
             try
             {
+                // Attempts to save the cypher and string that was added
                 CheckStrings(rotorString, cypher);
 
+                // saves the rotor name and the rotation letters
                 RotorName = name;
                 RotorRotationLetters = letters;
             }
+            // catches all exceptions
             catch (Exception ex)
             {
                 throw ex;
@@ -71,14 +73,10 @@ namespace EncryptionMachine
         /// </summary>
         public string RotorName
         {
-            get
-            {
-                return rotorName;
-            }
-            set
-            {
-                rotorName = value;
-            }
+            // retrieves the rotor name
+            get { return rotorName; }
+            // sets the rotor name
+            set { rotorName = value; }
         }
 
         /// <summary>
@@ -86,14 +84,10 @@ namespace EncryptionMachine
         /// </summary>
         public string RotorCypher
         {
-            get
-            {
-                return rotorCypher;
-            }
-            set
-            {
-                CheckStrings(RotorString, value);
-            }
+            // retrieves the rotor cypher
+            get { return rotorCypher; }
+            // attempts to set the rotor cypher
+            set { CheckStrings(RotorString, value); }
         }
 
         /// <summary>
@@ -101,14 +95,10 @@ namespace EncryptionMachine
         /// </summary>
         public string RotorString
         {
-            get
-            {
-                return rotorString;
-            }
-            set
-            {
-                CheckStrings(value, RotorCypher);
-            }
+            // retrieves the rotor string
+            get { return rotorString; }
+            // attempts to set the rotor string
+            set { CheckStrings(value, RotorCypher); }
         }
 
         /// <summary>
@@ -116,13 +106,52 @@ namespace EncryptionMachine
         /// </summary>
         public char[] RotorRotationLetters
         { 
-            get
-            {
-                return rotorRotateLetters;
-            }
+            // retrieves the rotor rotate letters
+            get { return rotorRotateLetters; }
+            // sets the rotor rotation letters
             set
             {
-                rotorRotateLetters = value;
+                // a new list that stores the characters that are unique
+                List<char> characters = new List<char>();
+
+                // a list that stores any error characters (e.g. not contained in the rotorString);
+                List<char> errorChars = new List<char>();
+
+                // runs through each option in the list
+                for (int i = 0; i < value.Length; i++)
+                {
+                    char c = value[i];  // the char to check
+
+                    // if the string contains the desired letter
+                    if (rotorString.Contains(c.ToString()))
+                    {
+                        // if the character is not already listed
+                        if (!characters.Contains(c))
+                            characters.Add(c);
+                    }
+                    // add the character to the error list
+                    else
+                        errorChars.Add(c);
+                }
+
+                // if there are errors
+                if (errorChars.Count > 0)
+                {
+                    // add the errors to a temporary dictionary
+                    Dictionary<POTENTIAL_ERRORS, List<char>> temp = new Dictionary<POTENTIAL_ERRORS, List<char>>();
+                    temp.Add(POTENTIAL_ERRORS.RototationLetters, errorChars);
+
+                    // throw an exception
+                    throw new InvalidRotorSettingsException(temp, RotorString, RotorCypher, 
+                        BasicFunctions.RunThroughList(new List<char>(value)));
+                }
+                // otherwise everything is valid
+                else
+                {
+                    // copy the rotation letters to the array
+                    rotorRotateLetters = new char[characters.Count];
+                    characters.CopyTo(rotorRotateLetters);
+                }
             }
         }
 
@@ -136,7 +165,11 @@ namespace EncryptionMachine
         /// <param name="rotations">the number of rotations to make</param>
         public void Rotate(int rotations = 1)
         {
+            CheckRotations(ref rotations);  // ensures a valid value was entered for the rotation
+
+            // rotate the cypher
             rotorCypher = RotateString(rotorCypher, rotations);
+            // rotate the string
             rotorString = RotateString(rotorString, rotations);
         }
 
@@ -153,12 +186,35 @@ namespace EncryptionMachine
         }
 
         /// <summary>
-        /// Allows for the rotor to be offset
+        /// Allows for the rotor to be offset (moves the cypher x number of times)
         /// </summary>
-        /// <param name="rotations"></param>
+        /// <param name="rotations">the number of rotations to make the offset</param>
         public void OffsetCypher(int rotations = 1)
         {
+            CheckRotations(ref rotations);  // ensures a valid value was entered for the rotations
+
+            // rotates the cypher the desired number of times
             rotorCypher = RotateString(rotorCypher, rotations);
+        }
+
+        /// <summary>
+        /// Verifies the number of rotations is a valid amount
+        /// </summary>
+        /// <param name="rotations"></param>
+        private void CheckRotations(ref int rotations)
+        {
+            // the exception that will be thrown if the rotation value is invalid
+            Exception ex = new IndexOutOfRangeException("You can not rotate " + rotations + " number of times");
+            
+            // if the rotations value is too small
+            if (rotations < -rotorString.Length)
+                throw ex;
+            // if the rotation value is less then 0, change the value to rotate the opposite direction
+            if (rotations < 0)
+                rotations = rotorString.Length + rotations;
+            // if the rotation value is too large
+            else if (rotations > rotorString.Length)
+                throw ex;
         }
 
         /// <summary>
@@ -177,39 +233,23 @@ namespace EncryptionMachine
         }
 
         /// <summary>
-        /// Sets the rotor string
-        /// </summary>
-        /// <param name="val"></param>
-        private void SetString(string val)
-        {
-            rotorString = val;
-        }
-
-        /// <summary>
-        /// Sets the rotor cypher
-        /// </summary>
-        /// <param name="val"></param>
-        private void SetCypher(string val)
-        {
-            rotorCypher = val;
-        }
-
-        /// <summary>
         /// Checks to make sure the strings are the same
         /// </summary>
         /// <param name="str">the string used to cross the rotor</param>
         /// <param name="cypher">the cypher used in the rotor</param>
         private void CheckStrings(string str, string cypher)
         {
+            // stores any errors that may occur
             Dictionary<POTENTIAL_ERRORS, List<char>> errors
                 = new Dictionary<POTENTIAL_ERRORS, List<char>>();
 
+            // a list that stores the information that is checked
             List<char> currentCheck = new List<char>();
 
             // check for dublicates in str
             currentCheck = BasicFunctions.DuplicatedCharacters(str);
 
-            if (currentCheck.Count > 0)
+            if (currentCheck.Count > 0) // if there are dublicates in the string
             {
                 errors.Add(POTENTIAL_ERRORS.Dublicates_FromString, currentCheck);
             }
@@ -217,20 +257,20 @@ namespace EncryptionMachine
             // check for dublicates in cypher
             currentCheck = BasicFunctions.DuplicatedCharacters(cypher);
 
-            if (currentCheck.Count > 0)
+            if (currentCheck.Count > 0) // if there are duplicates in the cypher
             {
                 errors.Add(POTENTIAL_ERRORS.Dublicates_FromCypher, currentCheck);
             }
 
             // look for missing letters
             currentCheck = CompareStringsCharacters(cypher, str);
-            if (currentCheck.Count > 0)
+            if (currentCheck.Count > 0) // if there are letters missing in the string
             {
                 errors.Add(POTENTIAL_ERRORS.Missing_FromString, currentCheck);
             }
 
             currentCheck = CompareStringsCharacters(str, cypher);
-            if (currentCheck.Count > 0)
+            if (currentCheck.Count > 0) // if there are letters missing in the cypher
             {
                 errors.Add(POTENTIAL_ERRORS.Missing_FromCypher, currentCheck);
             }
@@ -245,7 +285,7 @@ namespace EncryptionMachine
             else
             {
                 // throw exception
-                throw new InvalidRotorSettingsException(errors, str, cypher);
+                throw new InvalidRotorSettingsException(errors, str, cypher, DisplayRotationLetters());
             }
         }
 
@@ -257,19 +297,32 @@ namespace EncryptionMachine
         /// <returns>the list of characters that are missing</returns>
         private List<char> CompareStringsCharacters(string str1, string str2)
         {
+            // stores any invalid characters
             List<char> invalid = new List<char>();
 
+            // run through each letter in the first string
             for (int i = 0; i < str1.Length; i++)
             {
-                char c = str1[i];
+                char c = str1[i];   // stores the current letter
 
+                // if the letter is not in the list
                 if (!str2.Contains(c.ToString()))
+                    // if the letter is not in the second string
                     if (!invalid.Contains(c))
-                        invalid.Add(c);
+                        invalid.Add(c); // add it to the list
 
             }
 
-            return invalid;
+            return invalid; // returns the error list
+        }
+
+        /// <summary>
+        /// Displays the letters that cause the rotor to rotate
+        /// </summary>
+        /// <returns></returns>
+        private string DisplayRotationLetters()
+        {
+            return BasicFunctions.RunThroughList(new List<char>(rotorRotateLetters));
         }
 
         #endregion
@@ -285,10 +338,7 @@ namespace EncryptionMachine
             string str = "Rotor Name: " + RotorName + "\n";
             str += "Rotor Cypher: " + rotorCypher + "\n";
             str += "Rotor String: " + rotorString + "\n";
-            str += "Rotor Rotation Letters: ";
-
-            for (int i = 0; i < RotorRotationLetters.Length; i++)
-                str += RotorRotationLetters[i].ToString() + " ";
+            str += "Rotor Rotation Letters: " + DisplayRotationLetters();
 
             return str;
         }

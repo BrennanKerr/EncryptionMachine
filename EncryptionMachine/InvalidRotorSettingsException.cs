@@ -29,6 +29,10 @@ namespace EncryptionMachine
         /// Stors the cypher that was part of the error
         /// </summary>
         private string cypher = "";
+        /// <summary>
+        /// Stores the rototation letters that were part of the error
+        /// </summary>
+        private string letters = "";
 
         #endregion
 
@@ -40,11 +44,13 @@ namespace EncryptionMachine
         /// <param name="errorDictionary">Stores the list of errors that occured</param>
         /// <param name="rotorString">Stores the string that is stored for the rotor</param>
         /// <param name="rotorCypher">Stores the cypher that is stored for the rotor</param>
-        public InvalidRotorSettingsException(Dictionary<POTENTIAL_ERRORS, List<char>> errorDictionary, string rotorString, string rotorCypher)
+        /// <param name="rotationLetters">Stores the rotation letters that are stored for the rotor</param>
+        public InvalidRotorSettingsException(Dictionary<POTENTIAL_ERRORS, List<char>> errorDictionary, string rotorString, string rotorCypher, string rotationLetters)
         {
             errors = errorDictionary;
             str = rotorString;
             cypher = rotorCypher;
+            letters = rotationLetters;
         }
 
         #endregion
@@ -60,6 +66,7 @@ namespace EncryptionMachine
             {
                 string stringErrors = "";   // stores the string error message
                 string cypherErrors = "";   // store the cypher error message
+                string rotationErrors = ""; // stores the rotation letter error message
 
                 // checks for errors in the string
                 CheckForErrors(POTENTIAL_ERRORS.Dublicates_FromString, ref stringErrors, "Dublicates", false);
@@ -69,7 +76,10 @@ namespace EncryptionMachine
                 CheckForErrors(POTENTIAL_ERRORS.Dublicates_FromCypher, ref cypherErrors, "Dublicates");
                 CheckForErrors(POTENTIAL_ERRORS.Missing_FromCypher, ref cypherErrors, "Missing");
 
-                return stringErrors + cypherErrors;
+                // checks for errors in the rotation letters
+                CheckForErrors(POTENTIAL_ERRORS.RototationLetters, ref rotationErrors, "Cannot be used as rotation as they are not contained in rotor string: " + str, false, true);
+
+                return stringErrors + cypherErrors + rotationErrors;
             }
         }
 
@@ -89,6 +99,14 @@ namespace EncryptionMachine
             get { return cypher; }
         }
 
+        /// <summary>
+        /// Gets the rotor rotation letters
+        /// </summary>
+        public string Letters
+        {
+            get { return letters; }
+        }
+
         #endregion
 
         #region METHODS
@@ -101,12 +119,12 @@ namespace EncryptionMachine
         /// <param name="errorStr">the error string to append to</param>
         /// <param name="reason">the reason for the error</param>
         /// <param name="isCypher">true if the error is apart of the cypher, false if it is the string</param>
-        private void CheckForErrors(POTENTIAL_ERRORS key, ref string errorStr, string reason, bool isCypher = true)
+        private void CheckForErrors(POTENTIAL_ERRORS key, ref string errorStr, string reason, bool isCypher = true, bool isLetterError = false)
         {
             if (errors.ContainsKey(key))
             {
                 if (errorStr == "")
-                    errorStr += "Errors with " + (isCypher ? "Cypher: " + cypher : "String: " + str) + "\n";
+                    errorStr += "Errors with " + (isCypher ? "Cypher: " + cypher : (isLetterError ? "Letters: " + letters : "String: " + str)) + "\n";
 
                 errorStr += reason + ": " + BasicFunctions.RunThroughList(errors[key]);
             }
@@ -123,6 +141,7 @@ namespace EncryptionMachine
         Dublicates_FromString,
         Dublicates_FromCypher,
         Missing_FromString,
-        Missing_FromCypher
+        Missing_FromCypher,
+        RototationLetters
     }
 }

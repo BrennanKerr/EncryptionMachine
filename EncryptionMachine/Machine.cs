@@ -38,11 +38,13 @@ namespace EncryptionMachine
         /// <param name="reflector">the reflector that will be used</param>
         public Machine(Rotor[] rotors, Reflector reflector)
         {
+            // attempts to set the rotors and reflectors
             try
             {
                 Rotors = rotors;
                 Reflector = reflector;
             }
+            // catches any exceptions and rethrows it
             catch (Exception ex)
             {
                 throw ex;
@@ -58,14 +60,14 @@ namespace EncryptionMachine
         /// </summary>
         public Rotor[] Rotors
         {
-            get
-            {
-                return machineRotors;
-            }
+            // retireves all the machines rotors
+            get { return machineRotors; }
+            // sets all the machines rotors
             set
             {
-                machineRotors = new Rotor[value.Length];
+                machineRotors = new Rotor[value.Length];    // sets the length of the rotors array
 
+                // runs through each passed rotor and copies it
                 for (int i = 0; i < machineRotors.Length; i++)
                 {
                     machineRotors[i] = value[i].DeepCopy();
@@ -78,30 +80,23 @@ namespace EncryptionMachine
         /// </summary>
         /// <param name="index">the index of the desired rotor</param>
         /// <returns>the rotor at the given index</returns>
-        public Rotor GetRotorAt(int index)
-        {
-            return machineRotors[index];
-        }
+        public Rotor GetRotorAt(int index) { return machineRotors[index]; }
 
         /// <summary>
         /// Sets the rotor at the given index
         /// </summary>
         /// <param name="index">the index to change</param>
         /// <param name="newRotor">the settings of the new rotor</param>
-        public void SetRotorAt(int index, Rotor newRotor)
-        {
-            machineRotors[index] = newRotor.DeepCopy();
-        }
+        public void SetRotorAt(int index, Rotor newRotor) { machineRotors[index] = newRotor.DeepCopy(); }
 
         /// <summary>
         /// Gets or sets the machines reflectors
         /// </summary>
         public Reflector Reflector
         {
-            get
-            {
-                return machineReflector;
-            }
+            // retrieves the reflector used in the machine
+            get { return machineReflector; }
+            // sets the reflector used in the machine
             set
             {
                 machineReflector = value;
@@ -119,14 +114,8 @@ namespace EncryptionMachine
         /// <param name="rotations">the number of rotations</param>
         public void RotateRotor(int index = 0, int rotations = 1)
         {
-            if (index >= 0 && index < machineRotors.Length)
-            {
-                machineRotors[index].Rotate(rotations);
-            }
-            else
-            {
-                throw new IndexOutOfRangeException("The index selected is out of range");
-            }
+            // rotate the rotor
+            machineRotors[index].Rotate(rotations);
         }
 
         #endregion
@@ -154,13 +143,4 @@ namespace EncryptionMachine
         }
         #endregion
     }
-
-
-    /// <summary>
-    /// Delegate function used to allow user to define their own encryption
-    /// method
-    /// </summary>
-    /// <param name="character">the character to encrypt</param>
-    /// <returns>the encrypted character</returns>
-    public delegate char EncryptionMethod(char character);
 }
