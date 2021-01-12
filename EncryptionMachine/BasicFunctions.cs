@@ -69,5 +69,32 @@ namespace EncryptionMachine
 
             return str;
         }
+
+        /// <summary>
+        /// Compares the two strings to ensure they share characters
+        /// </summary>
+        /// <param name="str1">the first string that contains all the desired characters</param>
+        /// <param name="str2">the second string</param>
+        /// <returns>the list of characters that are missing</returns>
+        public static List<char> CompareStringsCharacters(string str1, string str2)
+        {
+            // stores any invalid characters
+            List<char> invalid = new List<char>();
+
+            // run through each letter in the first string
+            for (int i = 0; i < str1.Length; i++)
+            {
+                char c = str1[i];   // stores the current letter
+
+                // if the letter is not in the list
+                if (!str2.Contains(c.ToString()))
+                    // if the letter is not in the second string
+                    if (!invalid.Contains(c))
+                        invalid.Add(c); // add it to the list
+
+            }
+
+            return invalid; // returns the error list
+        }
     }
 }
