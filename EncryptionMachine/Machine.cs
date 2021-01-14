@@ -28,6 +28,11 @@ namespace EncryptionMachine
         /// </summary>
         private Reflector machineReflector;
 
+        /// <summary>
+        /// Defines the plugboard that will be used
+        /// </summary>
+        private Plugboard machinePlugboard;
+
         #endregion
 
         #region CONSTRUCTORS
@@ -37,15 +42,17 @@ namespace EncryptionMachine
         /// </summary>
         /// <param name="rotors">the list of rotors that will be used</param>
         /// <param name="reflector">the reflector that will be used</param>
-        public Machine(Rotor[] rotors, Reflector reflector)
+        /// <param name="plugboard">The plugboard that will be used</param>
+        public Machine(Rotor[] rotors, Reflector reflector, Plugboard plugboard)
         {
             // attempts to set the rotors and reflectors
             try
             {
-                CheckMachineParameters(rotors, reflector);
+                CheckMachineParameters(rotors, reflector, plugboard);
 
                 SetRotors(rotors);
                 SetReflector(reflector);
+                SetPlugboard(plugboard);
             }
             // catches any exceptions and rethrows it
             catch (Exception ex)
@@ -77,43 +84,12 @@ namespace EncryptionMachine
 
                 // if there are errors
                 if (errors.Count > 0)
-                    throw new RotorComparisionException(machineRotors, machineReflector, errors, new List<char>());
+                    throw new RotorComparisionException(machineRotors, machineReflector, machinePlugboard, 
+                        errors, new List<char>(), new List<char>());
                 // otherwise set the rotors
                 else
                     SetRotors(value);
             }
-        }
-
-        /// <summary>
-        /// Retrieves the rotor at the given index
-        /// </summary>
-        /// <param name="index">the index of the desired rotor</param>
-        /// <returns>the rotor at the given index</returns>
-        public Rotor GetRotorAt(int index) { return machineRotors[index]; }
-
-        /// <summary>
-        /// Sets the rotor at the given index
-        /// </summary>
-        /// <param name="index">the index to change</param>
-        /// <param name="newRotor">the settings of the new rotor</param>
-        public void SetRotorAt(int index, Rotor newRotor) 
-        {
-            List<char> errorCheck = CheckRotor(machineRotors[0], newRotor);
-
-            if (errorCheck.Count > 0)
-            {
-                // creates a temporary array used for the exception
-                Rotor[] temp = new Rotor[] { machineRotors[0], newRotor };
-                // creates a dictionary to store the information
-                Dictionary<int, List<char>> errors = new Dictionary<int, List<char>>();
-                errors.Add(1, errorCheck);
-
-                // throws the exception
-                throw new RotorComparisionException(machineRotors, machineReflector, errors, new List<char>());
-            }
-
-            // save the rotor if no errors
-            machineRotors[index] = newRotor.DeepCopy(); 
         }
 
         /// <summary>
@@ -131,16 +107,67 @@ namespace EncryptionMachine
 
                 // if there are errors
                 if (errors.Count > 0)
-                    throw new RotorComparisionException(machineRotors, machineReflector, new Dictionary<int, List<char>>(), errors);
+                    throw new RotorComparisionException(machineRotors, machineReflector, machinePlugboard,
+                        new Dictionary<int, List<char>>(), errors, new List<char>());
                 // otherwise set it
                 else
                     SetReflector(value);
             }
         }
 
+        /// <summary>
+        /// Gets or sets the plugboard
+        /// </summary>
+        public Plugboard Plugboard
+        {
+            get { return machinePlugboard; }
+            set
+            {
+                List<char> errors = CheckPlugboard(machineRotors[0], value);
+
+                if (errors.Count > 0)
+                    throw new RotorComparisionException(Rotors, Reflector, value,
+                        new Dictionary<int, List<char>>(), new List<char>(), errors);
+                else SetPlugboard(value);
+            }
+        }
+
         #endregion
 
         #region METHODS
+
+        /// <summary>
+        /// Retrieves the rotor at the given index
+        /// </summary>
+        /// <param name="index">the index of the desired rotor</param>
+        /// <returns>the rotor at the given index</returns>
+        public Rotor GetRotorAt(int index) { return machineRotors[index]; }
+
+        /// <summary>
+        /// Sets the rotor at the given index
+        /// </summary>
+        /// <param name="index">the index to change</param>
+        /// <param name="newRotor">the settings of the new rotor</param>
+        public void SetRotorAt(int index, Rotor newRotor)
+        {
+            List<char> errorCheck = CheckRotor(machineRotors[0], newRotor);
+
+            if (errorCheck.Count > 0)
+            {
+                // creates a temporary array used for the exception
+                Rotor[] temp = new Rotor[] { machineRotors[0], newRotor };
+                // creates a dictionary to store the information
+                Dictionary<int, List<char>> errors = new Dictionary<int, List<char>>();
+                errors.Add(1, errorCheck);
+
+                // throws the exception
+                throw new RotorComparisionException(machineRotors, machineReflector, machinePlugboard,
+                    errors, new List<char>(), new List<char>());
+            }
+
+            // save the rotor if no errors
+            machineRotors[index] = newRotor.DeepCopy();
+        }
 
         /// <summary>
         /// Rotates the rotor at the given index
@@ -158,16 +185,19 @@ namespace EncryptionMachine
         /// </summary>
         /// <param name="rotors">the rotor list</param>
         /// <param name="reflector">the reflector list</param>
-        private void CheckMachineParameters(Rotor[] rotors, Reflector reflector)
+        private void CheckMachineParameters(Rotor[] rotors, Reflector reflector, Plugboard plugboard)
         {
             // checks the rotors
             Dictionary<int, List<char>> rotorErrors = CompareRotors(rotors);
             // checks the reflectors
             List<char> reflectorError = CheckReflector(rotors[0], reflector);
+            // checks the plugboard
+            List<char> plugboardError = CheckPlugboard(rotors[0], plugboard);
 
             // if there are any errors, throw the exception
             if (reflectorError.Count > 0 || rotorErrors.Count > 0)
-                throw new RotorComparisionException(rotors, reflector, rotorErrors, reflectorError);
+                throw new RotorComparisionException(rotors, reflector, plugboard, 
+                    rotorErrors, reflectorError, plugboardError);
         }
 
         /// <summary>
@@ -218,6 +248,17 @@ namespace EncryptionMachine
         {
             return BasicFunctions.CompareStringsCharacters(rotor.RotorString, reflector.ReflectorReflection);
         }
+        
+        /// <summary>
+        /// Compares the plugboard to a rotor to ensure the characters match
+        /// </summary>
+        /// <param name="rotor">the rotor to check</param>
+        /// <param name="plugboard">the plugboard to check</param>
+        /// <returns>the list of invalid characters</returns>
+        private List<char> CheckPlugboard(Rotor rotor, Plugboard plugboard)
+        {
+            return BasicFunctions.CompareStringsCharacters(rotor.RotorString, plugboard.Combinations);
+        }
 
         /// <summary>
         /// Sets the rotors
@@ -238,11 +279,29 @@ namespace EncryptionMachine
         /// Sets the reflector
         /// </summary>
         /// <param name="reflector">the new reflector</param>
-        private void SetReflector(Reflector reflector)
-        {
-            machineReflector = reflector;
-        }
+        private void SetReflector(Reflector reflector) { machineReflector = reflector.DeepCopy(); }
 
+        /// <summary>
+        /// Sets the plugboard
+        /// </summary>
+        /// <param name="plugboard">the new plugboard</param>
+        private void SetPlugboard(Plugboard plugboard) { machinePlugboard = plugboard.DeepCopy(); }
+
+        /// <summary>
+        /// Copies the machine
+        /// </summary>
+        /// <returns>the copied machine</returns>
+        public Machine DeepCopy()
+        {
+            Rotor[] rotors = new Rotor[this.Rotors.Length];
+            Reflector reflector = this.Reflector.DeepCopy();
+            Plugboard plugboard = this.Plugboard.DeepCopy();
+
+            for (int i = 0; i < this.Rotors.Length; i++)
+                rotors[i] = this.Rotors[i].DeepCopy();
+
+            return new Machine(rotors, reflector, plugboard);
+        }
         #endregion
 
         #region OVERRIDES
@@ -263,6 +322,7 @@ namespace EncryptionMachine
             }
 
             str += "Reflector: \n\n" + machineReflector.ToString();
+            str += "Plugboard: \n\n" + machinePlugboard.ToString();
 
             return str;
         }

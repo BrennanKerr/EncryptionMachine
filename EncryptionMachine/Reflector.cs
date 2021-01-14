@@ -104,6 +104,18 @@ namespace EncryptionMachine
             return ReflectorReflection[BasicFunctions.IndexInAlphabet(c)];
         }
 
+        /// <summary>
+        /// Creates a copy of the reflector
+        /// </summary>
+        /// <returns>the copied reflector</returns>
+        public Reflector DeepCopy()
+        {
+            string reflection = this.reflectorReflection;
+            string name = this.ReflectorName;
+
+            return new Reflector(name, reflection);
+        }
+
         #endregion
 
         #region OVERRIDES

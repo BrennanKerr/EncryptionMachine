@@ -23,6 +23,10 @@ namespace EncryptionMachine
         /// Stores the reflector
         /// </summary>
         private Reflector reflector;
+        /// <summary>
+        /// Stores the plugboard
+        /// </summary>
+        private Plugboard plugboard;
 
         /// <summary>
         /// Stores the reflector errors
@@ -32,22 +36,32 @@ namespace EncryptionMachine
         /// Stores the rotor missing characters with the index as the key
         /// </summary>
         private Dictionary<int, List<char>> rotorMissingChars = new Dictionary<int, List<char>>();
+        /// <summary>
+        /// Stores the plugboard missing characters
+        /// </summary>
+        private List<char> plugboardMissingChars = new List<char>();
 
         /// <summary>
         /// Constructor
         /// </summary>
         /// <param name="rotors">the rotors of the machine</param>
-        /// <param name="reflector">the reflectors of the machine</param>
+        /// <param name="reflector">the reflectors of the machine</param>\
+        /// <param name = "plugboard" > the plugboard of the machien</param>
         /// <param name="rotorMissingChars">the characters missing in the rotors and the index</param>
         /// <param name="reflectorMissingChars">the characters missing in the reflector</param>
-        public RotorComparisionException(Rotor[] rotors, Reflector reflector, 
-            Dictionary<int, List<char>> rotorMissingChars, List<char> reflectorMissingChars)
+        /// <param name="plugboardMissingChars">the characters missing in the plugboard</param>
+        public RotorComparisionException(Rotor[] rotors, Reflector reflector, Plugboard plugboard,
+            Dictionary<int, List<char>> rotorMissingChars, List<char> reflectorMissingChars,
+            List<char> plugboardMissingChars)
         {
             this.rotors = rotors;
             this.reflector = reflector;
 
             this.rotorMissingChars = rotorMissingChars;
             this.reflectorMissingChars = reflectorMissingChars;
+
+            this.plugboard = plugboard;
+            this.plugboardMissingChars = plugboardMissingChars;
         }
 
         /// <summary>
@@ -64,6 +78,7 @@ namespace EncryptionMachine
                 // adds the errors
                 returnString += RotorErrors;
                 returnString += ReflectorErrors;
+                returnString += PlugboardErrors;
 
                 // returns the errror
                 return returnString;
@@ -124,6 +139,26 @@ namespace EncryptionMachine
                 else returnString += "No Reflector Errors\n\n";
                 
                 // returns the errors
+                return returnString;
+            }
+        }
+
+        /// <summary>
+        /// Gets the plugboard errors
+        /// </summary>
+        public string PlugboardErrors
+        {
+            get
+            {
+                string returnString = "";
+
+                if (plugboardMissingChars.Count > 0)
+                {
+                    returnString += "Plugboard Errors: \n";
+                    returnString += plugboard.ToString() + "\n\tMissing Chars: ";
+                    returnString += BasicFunctions.RunThroughList(plugboardMissingChars) + "\n";
+                }
+
                 return returnString;
             }
         }

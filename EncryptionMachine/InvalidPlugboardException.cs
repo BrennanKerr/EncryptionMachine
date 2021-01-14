@@ -95,17 +95,21 @@ namespace EncryptionMachine
         { 
             get
             {
+                // starts the exception string
                 string str = "PLUGBOARD ERRORS: ";
                 str += "\n" + combinations + "\n";
 
+                // if there were dublicated errors
                 if (reason == PLUGBOARD_ERRORS.DublicatedLetters)
                 {
                     str += "Dublicates: " + BasicFunctions.RunThroughList(errors);
                 }
+                // if there are non paried chars
                 else if (reason == PLUGBOARD_ERRORS.CharsNotPaired)
                 {
                     str += "NOT PAIRED: " + BasicFunctions.RunThroughList(errors);
                 }
+                // if the pair does not exist
                 else if (reason == PLUGBOARD_ERRORS.PairDoesNotExist)
                 {
                     str += "PAIR DOES NOT EXIST FOR " + BasicFunctions.RunThroughList(errors);

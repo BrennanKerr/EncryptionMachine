@@ -171,6 +171,32 @@ namespace EncryptionMachine
             return i + (i % 2 == 0 ? 1 : -1);
         }
 
+        /// <summary>
+        /// Creates a copy of the plugboard
+        /// </summary>
+        /// <returns>the plugboard copy</returns>
+        public Plugboard DeepCopy()
+        {
+            string combos = this.plugboardCombinations;
+            return new Plugboard(combos);
+        }
         #endregion
+
+        /// <summary>
+        /// Converts the plugboard to a string
+        /// </summary>
+        /// <returns>the plugboard combinations</returns>
+        public override string ToString()
+        {
+            string str = "Combinations: ";
+            
+            for (int i = 0; i < Combinations.Length; i+=2)
+            {
+                str += Combinations[i] + " = " + Combinations[i + 1] 
+                    + (i == Combinations.Length - 2 ? "" : " , ");
+            }
+
+            return str;
+        }
     }
 }
